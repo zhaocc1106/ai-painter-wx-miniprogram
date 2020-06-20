@@ -1,0 +1,18 @@
+.share-image {
+  width: 94%;
+  height: 1000rpx;
+  margin: 0 auto;
+  margin-left: 3%;
+  margin-top: 20rpx;
+  border-radius: 10rpx;
+  box-shadow:0 1px 3px rgba(0,0,0,.1)
+}
+
+button {
+	width: 44%;
+  float: left;
+  margin-left: 4%;
+  margin-top: 20rpx;
+  color: #333;
+  background: #ffcc01;
+}

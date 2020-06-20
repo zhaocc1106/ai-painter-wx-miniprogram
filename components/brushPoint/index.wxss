@@ -1,0 +1,48 @@
+/* components/brushPoint/index.wxss */
+
+.brush-point-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.brush-point-front {
+  z-index: 3;
+  position: absolute;
+  left: 32.5;
+  top: 32.5;
+}
+
+.brush-point-bg{
+  z-index: 2;
+}
+
+.click-effect {
+  background: gray;
+  opacity: 0;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 64rpx;
+  z-index: 1;
+  position: absolute; 
+  left: 50%;
+  margin-left: -32rpx;
+  animation-delay: 0.1s;
+  animation: click-effect-show 0.1s linear 1;
+}
+
+
+/* ---------------------------------动画-------------------------------------------*/
+@keyframes click-effect-show {
+  from, to {
+     opacity: 0;
+  }
+
+  50%{
+    opacity: 0.5;
+  }
+}

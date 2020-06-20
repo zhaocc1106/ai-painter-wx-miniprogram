@@ -1,0 +1,6 @@
+<!--components/customToggle/index.wxml-->
+<view class="toggle-container" catchtap="_click">
+  <view class="toggle-bg" style="width:{{width}}" hidden="{{!selected}}" ></view>
+  <image class="icon" src="{{imgUrl}}"></image>
+  <text class="text">{{text}}</text>
+</view>

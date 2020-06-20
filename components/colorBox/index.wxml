@@ -1,0 +1,5 @@
+<view class="color-box-container">
+  <view class="{{selected?'color-box-selected':'color-box'}}" style="background:{{color}}" catchtap='_select'>
+  </view>
+  <view class="bottom-line" hidden='{{!selected}}' style="background:{{color}}"></view>
+</view>

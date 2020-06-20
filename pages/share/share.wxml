@@ -1,0 +1,8 @@
+<!--index.wxml-->
+<view class="container">
+  <image src="{{shareImage}}" class="share-image"></image>
+  <canvasdrawer painting="{{painting}}" class="canvasdrawer" bind:getImage="eventGetImage"/>
+
+  <button class="btn-share" open-type="share">分享好友</button>
+  <button bind:tap="eventSave">保存本地</button>
+</view>

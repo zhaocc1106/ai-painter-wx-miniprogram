@@ -1,0 +1,15 @@
+{
+	"navigationBarBackgroundColor": "#ffcc01",
+	"navigationBarTextStyle": "black",
+	"navigationBarTitleText": "涂鸦画画",
+	"backgroundColor": "white",
+	"backgroundTextStyle": "dark",
+	"enablePullDownRefresh": false,
+	"disableScroll": true,
+	"usingComponents": {
+		"brush-point": "/components/brushPoint/index",
+		"color-box": "/components/colorBox/index",
+		"custom-toggle": "/components/customToggle/index",
+		"custom-button": "/components/customButton/index"
+	}
+}

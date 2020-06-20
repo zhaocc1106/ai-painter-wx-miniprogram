@@ -1,0 +1,32 @@
+/* components/customToggle/index.wxss */
+
+.toggle-container {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.toggle-container .icon{
+  width: 50rpx;
+  height: 50rpx;
+  z-index: 3;
+}
+
+.toggle-container .text{
+  height: 50rpx;
+  line-height: 50rpx;
+  text-align: left;
+  margin-left: 5rpx;
+  z-index: 3;
+  font-size: 30rpx;
+}
+
+.toggle-container .toggle-bg{
+  z-index: 1;
+  position: absolute;
+  height: 100%;
+  background: white;
+  border-radius: 20rpx;
+}

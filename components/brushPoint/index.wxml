@@ -1,0 +1,6 @@
+<!--components/brushPoint/index.wxml-->
+<view catchtap='_select' class="brush-point-container">
+  <view class="click-effect" hidden="{{hideEffect}}"></view>
+  <view class="brush-point-front" style="background:{{color}};width:{{innerRadius}}rpx; height:{{innerRadius}}rpx; border-radius: {{innerRadius}}rpx;"></view>
+  <view class="brush-point-bg " hidden='{{!selected}}' style="background:{{bgColor}};width:{{outterRadius}}rpx; height:{{outterRadius}}rpx; border-radius: {{outterRadius}}rpx;"></view>
+</view>

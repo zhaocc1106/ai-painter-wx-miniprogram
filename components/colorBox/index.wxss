@@ -1,0 +1,48 @@
+/* components/colorBox/index.wxss */
+
+/* 显示颜色的盒子 */
+
+.color-box {
+  width: 100%;
+  height: 60rpx;
+  margin-top: 27rpx;
+}
+
+.color-box-selected {
+  width: 100%;
+  height: 60rpx;
+  margin-top: 27rpx;
+  animation: color-box-up 0.1s linear 1;
+  animation-fill-mode: forwards;
+}
+
+.bottom-line {
+  width: 0rpx;
+  height: 5rpx;
+  z-index: 3;
+  position: absolute;
+  top: 87rpx;
+  animation-delay: 0.05s;
+  animation: bottom-line-show 0.2s ease-in 1;
+  animation-fill-mode: forwards;
+}
+
+/* ---------------------------------动画-------------------------------------------*/
+
+@keyframes color-box-up {
+  to {
+    transform: translateY(-10rpx);
+  }
+}
+
+@keyframes bottom-line-show {
+  from {
+    widh: 0rpx;
+    transform: translateX(30rpx);
+  }
+
+  to {
+    width: 60rpx;
+    transform: translateX(0rpx);
+  }
+}

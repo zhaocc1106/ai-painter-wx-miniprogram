@@ -1,0 +1,12 @@
+{
+  "navigationBarBackgroundColor": "#ffcc01",
+	"navigationBarTextStyle": "black",
+	"navigationBarTitleText": "分享保存",
+	"backgroundColor": "white",
+	"backgroundTextStyle": "dark",
+	"enablePullDownRefresh": false,
+	"disableScroll": true,
+  "usingComponents": {
+    "canvasdrawer": "/components/canvasdrawer/canvasdrawer"
+  }
+}
