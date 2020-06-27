@@ -16,6 +16,7 @@ var begin = false;
 var curDrawArr = [];
 var lastCoord = null; // 记录画笔上一个坐标
 var predictStroke = []; // 用于预测的笔画偏移量数组
+var drawing = false; // 正在画画
 
 Page({
   /**
@@ -122,7 +123,9 @@ Page({
   /*--------------------- UI事件 --------------------------------------------------- */
   // 绘制开始 手指开始按到屏幕上
   touchStart: function (e) {
+    drawing = true;
     this.lineBegin(e.touches[0].x, e.touches[0].y)
+    this.recordPredictStroke(e.touches[0].x, e.touches[0].y);
     curDrawArr.push({
       x: e.touches[0].x,
       y: e.touches[0].y
@@ -144,6 +147,7 @@ Page({
 
   // 绘制结束 手指抬起
   touchEnd: function () {
+    drawing = false;
     drawInfos.push({
       drawArr: curDrawArr,
       color: this.data.currentColor,
@@ -153,7 +157,11 @@ Page({
     curDrawArr = [];
     this.lineEnd();
     predictStroke[predictStroke.length - 1][2] = 1.0;
-    classifier.classify(predictStroke).then((res) => {
+    classifier.classify(predictStroke, (res) => {
+      if (drawing) {
+        console.log('Is drawing, ignore it.');
+        return;
+      }
       // console.log(res);
       let probs = res.probs;
       for (let i = 0; i < probs.length; i++) {

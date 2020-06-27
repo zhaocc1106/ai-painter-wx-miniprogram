@@ -19,7 +19,7 @@ let classNames = null; // 记录所有的类型名
 /**
  * 数组转成tensor
  */
-function tensorPreprocess(inks) {
+async function tensorPreprocess(inks) {
   return tf.tidy(() => {
     //convert to a tensor
     let tensor = tf.tensor(inks);
@@ -62,14 +62,15 @@ async function loadModels(globalData) {
   console.time('LoadModel');
 
   /* 加载模型，预热模型 */
-  model = await tfLayers.loadLayersModel(MODEL_URL, stateful=true);
+  model = await tfLayers.loadLayersModel(MODEL_URL);
   let warmupStroke = [
     [0., 0., 0.]
   ];
   // await classify(warmupStroke);
-  let predTf = model.predict(tensorPreprocess(warmupStroke));
-  pred = await predTf.dataSync();
-  predTf.dispose();
+  let strokeTensor = await tensorPreprocess(warmupStroke);
+  let pred = await model.predict(strokeTensor);
+  let predArr = await pred.dataSync();
+  pred.dispose();
   model.resetStates();
 
   console.timeEnd('LoadModel');
@@ -121,32 +122,37 @@ function getClassNames(indices) {
  * @param {*} predictStroke 笔画
  * @returns top5分类名与概率大小
  */
-async function classify(predictStroke) {
+async function classify(predictStroke, succCb, failCb) {
   if (model === undefined) {
     console.log('Model unloaded!');
-    return null;
+    if (failCb) {
+      failCb('Model unloaded!');
+    }
   }
-
-  // console.log('predictStroke: ' + predictStroke);
 
   model.resetStates();
   // Predict the class name index.
-  let pred = model.predict(tensorPreprocess(predictStroke));
-  let predArr = pred.dataSync();
-  // console.log(predArr.sort().reverse());
-  pred.dispose();
-
-  // find the top 5 predictions
-  const indices = findIndicesOfMax(predArr, 5);
-  // console.log('The predict indices:');
-  // console.log(indices);
-  const probs = findTopValues(predArr, 5);
-  // console.log('The predict probabilities:');
-  // console.log(probs);
-  const names = getClassNames(indices);
-  // console.log('The predict names:');
-  // console.log(names);
-  return {probs: probs, names: names}
+  let strokeTensor = await tensorPreprocess(predictStroke);
+  let pred = await model.predict(strokeTensor);
+  await pred.data().then(predArr => {
+    pred.dispose();
+    // find the top 5 predictions
+    const indices = findIndicesOfMax(predArr, 5);
+    // console.log('The predict indices:');
+    // console.log(indices);
+    const probs = findTopValues(predArr, 5);
+    // console.log('The predict probabilities:');
+    // console.log(probs);
+    const names = getClassNames(indices);
+    // console.log('The predict names:');
+    // console.log(names);
+    if (succCb) {
+      succCb({
+        probs: probs,
+        names: names
+      });
+    }
+  });
 }
 
 /**
@@ -158,10 +164,10 @@ async function resetClassifier() {
   }
 }
 
-autoPainter = {
+let classifier = {
   loadModels: loadModels,
   classify: classify,
   resetClassifier: resetClassifier,
 };
 
-module.exports = autoPainter;
+module.exports = classifier;

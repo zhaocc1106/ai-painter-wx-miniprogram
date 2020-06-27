@@ -28,7 +28,7 @@
 		<view class="option-row" id="secondRow">
       <view class="class-view" wx:for="{{classesName.length}}" wx:key="index">
         <text class="class-name">{{classesName[index]}}</text>
-        <progress class="class-prog" percent="{{classesProg[index]}}" active show-info duration="15" />
+        <progress class="class-prog" percent="{{classesProg[index]}}" active active-mode="forwards" show-info duration="10" font-size="13" />
 			</view>
 		</view>
 	</view>
