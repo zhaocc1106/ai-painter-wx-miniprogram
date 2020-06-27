@@ -1,70 +1,35 @@
 <!-- https://github.com/ETRick/MiniProgram-Draw -->
 <view class="container">
-  <view class="question">
-    <view class="userinfo-avatar"><open-data type="userAvatarUrl"></open-data></view>
-    
-    <text>题目: {{levelData.question.answer}}</text>
-  </view>
+	<view class="question">
+		<view class="userinfo-avatar">
+			<open-data type="userAvatarUrl"></open-data>
+		</view>
+		<text>{{status}}</text>
+	</view>
 
-  <view class="palette" wx:if="{{!waiting}}">
-    <canvas canvas-id="firstCanvas" disable-scroll="true" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
-    </canvas>
-  </view>
+	<view class="palette" wx:if="{{!waiting}}">
+		<canvas canvas-id="firstCanvas" disable-scroll="true" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+		</canvas>
+	</view>
 
-  <view class="option-panel">
-    <view class="option-row" id="firstRow">
-      <view class="width-container">
-        <text>笔触大小</text>
-        <block wx:for="{{lineWidthArr.length}}" wx:key="index">
-          <brush-point class="brush-point" radius="{{lineWidthArr[index]}}" data-index="{{index}}" selected="{{index === curWidthIndex}}" bind:select="clickChangeWidth" color="{{currentColor}}"></brush-point>
-        </block>
-      </view>
-    </view>
-    <view class="option-row" id="secondRow">
-      <view class="color-slecotr-left"></view>
-      <scroll-view scroll-x="true">
-        <block wx:for="{{avaliableColors}}" wx:key="index">
-          <color-box class="color-box" data-color="{{avaliableColors[index]}}" selected="{{avaliableColors[index]===currentColor}}" bind:select="clickChangeColor"></color-box>
-        </block>
-      </scroll-view>
-      <view class="color-slecotr-right"></view>
-    </view>
+	<view class="option-panel">
+		<view class="option-row" id="firstRow">
+			<view class="width-container">
+				<text>笔触大小</text>
+				<block wx:for="{{lineWidthArr.length}}" wx:key="index">
+					<brush-point class="brush-point" radius="{{lineWidthArr[index]}}" data-index="{{index}}" selected="{{index === curWidthIndex}}" bind:select="clickChangeWidth" color="{{currentColor}}"></brush-point>
+				</block>
+			</view>
+			<view class="useless"></view>
+			<custom-button class="icon-text" imgUrl="/images/games/common/btn_tranCan.png" bind:clickEvent="clickClearAll" text="清除">
+			</custom-button>
+		</view>
 
-    <view class="option-row" id="thirdRow">
-      <view class="tool-container">
-      <custom-button class="icon-text" 
-          imgUrl="/images/games/common/btn_back.png"
-          bind:clickEvent="clickFallback"
-          text="撤销"
-          width="100%">
-        </custom-button>
-
-        <custom-toggle class="icon-text" 
-          imgUrl="/images/games/common/btn_erase.png" 
-          selected="{{bgColor===currentColor}}" 
-          bind:clickEvent="clickErase"
-          text="橡皮"
-          width="100%">
-        </custom-toggle>
-        
-        <custom-button class="icon-text" 
-          imgUrl="/images/games/common/btn_tranCan.png" 
-          bind:clickEvent="clickClearAll"
-          text="清除"
-          width="100%">
-        </custom-button>
-
-        <custom-button class="icon-text" 
-          imgUrl="/images/games/common/btn_pageview.png" 
-          bind:clickEvent="pageView"
-          text="预览"
-          width="100%">
-        </custom-button>
-      </view>
-    </view>
-    <view class="option-row" id="forthRow">
-      <button type="primary" class="share-btn" bindtap='goRelease'>发布佳作</button>
-      <button type="primary" class="share-btn" bindtap='clickShare'>发起猜猜</button>
-    </view>
-  </view>
+		<view class="option-row" id="secondRow">
+      <view class="class-view" wx:for="{{classesName.length}}" wx:key="index">
+        <text class="class-name">{{classesName[index]}}</text>
+        <progress class="class-prog" percent="{{classesProg[index]}}" active show-info duration="15" />
+			</view>
+		</view>
+	</view>
 </view>

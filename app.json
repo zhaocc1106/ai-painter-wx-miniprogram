@@ -6,8 +6,14 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#f0efef",
-    "navigationBarTitleText": "你画我猜",
+    "navigationBarTitleText": "AI涂鸦",
     "navigationBarTextStyle": "black"
   },
-  "sitemapLocation": "sitemap.json"
+  "sitemapLocation": "sitemap.json",
+  "plugins": {
+    "tfjsPlugin": {
+      "version": "0.1.0",
+      "provider": "wx6afed118d9e81df9"
+    }
+  }
 }

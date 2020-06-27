@@ -1,8 +1,8 @@
 {
 	"navigationBarBackgroundColor": "#ffcc01",
 	"navigationBarTextStyle": "black",
-	"navigationBarTitleText": "涂鸦画画",
-	"backgroundColor": "white",
+	"navigationBarTitleText": "AI猜图",
+	"backgroundColor": "#ffffff",
 	"backgroundTextStyle": "dark",
 	"enablePullDownRefresh": false,
 	"disableScroll": true,

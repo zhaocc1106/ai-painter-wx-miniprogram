@@ -3,12 +3,19 @@
 
 const app = getApp();
 
-var drawInfos = []
-var startX = 0
-var startY = 0
-var bgColor = "white"
-var begin = false
-var curDrawArr = []
+const classifier = require('../../components/aiModels/classifier/classifier.js');
+
+const DRAW_SIZE = [255, 255];
+const DRAW_PREC = 0.03678;
+
+var drawInfos = [];
+var startX = 0;
+var startY = 0;
+var bgColor = "white";
+var begin = false;
+var curDrawArr = [];
+var lastCoord = null; // 记录画笔上一个坐标
+var predictStroke = []; // 用于预测的笔画偏移量数组
 
 Page({
   /**
@@ -16,33 +23,32 @@ Page({
    */
   data: {
     levelId: 0,
-    levelData: {
-      question: {
-        answer: "这是题目"
-      }
-    },
-    hidden: true,   // 是否隐藏生成海报的canvas
+    status: "正在努力加载模型...",
+    hidden: true, // 是否隐藏生成海报的canvas
     bgColor: bgColor,
     currentColor: 'black',
     avatarUrl: "",
     curWidthIndex: 0,
     lineWidthArr: [2, 5, 10, 20],
-    avaliableColors: ["black", "red", "blue", "gray", "#ff4081", 
-      "#009681", "#259b24", "green", "#0000CD", "#1E90FF", "#ADD8E6", "#FAEBD7", "#FFF0F5",// orange
-      '#FFEBA3','#FFDE7A','#FFCE52','#FFBB29','#FFA500','#D98600','#B36800','#8C4D00','#663500',
+    avaliableColors: ["black", "red", "blue", "gray", "#ff4081",
+      "#009681", "#259b24", "green", "#0000CD", "#1E90FF", "#ADD8E6", "#FAEBD7", "#FFF0F5", // orange
+      '#FFEBA3', '#FFDE7A', '#FFCE52', '#FFBB29', '#FFA500', '#D98600', '#B36800', '#8C4D00', '#663500',
       // red
       '#FFAFA3', '#FF887A', '#FF5D52', '#FF3029', '#FF0000', '#D90007', '#B3000C', '#8C000E', '#66000E',
       // green
-      '#7BB372','#58A650','#389931','#1A8C16','#008000','#005903','#003303',
+      '#7BB372', '#58A650', '#389931', '#1A8C16', '#008000', '#005903', '#003303',
       // yellow
-      '#FFF27A','#FFF352','#FFF829','#FFFF00','#D2D900','#A7B300','#7E8C00','#586600',
+      '#FFF27A', '#FFF352', '#FFF829', '#FFFF00', '#D2D900', '#A7B300', '#7E8C00', '#586600',
       // cyan
-      '#A3FFF3','#7AFFF2','#52FFF3','#29FFF8','#00FFFF','#00D2D9','#00A7B3','#007E8C','#005866',
+      '#A3FFF3', '#7AFFF2', '#52FFF3', '#29FFF8', '#00FFFF', '#00D2D9', '#00A7B3', '#007E8C', '#005866',
       // blue
-      '#A3AFFF','#7A88FF','#525DFF','#2930FF','#0000FF','#0700D9','#0C00B3','#0E008C','#0E0066',
+      '#A3AFFF', '#7A88FF', '#525DFF', '#2930FF', '#0000FF', '#0700D9', '#0C00B3', '#0E008C', '#0E0066',
       // Violet
-      '#FAB1F7','#EE82EE','#C463C7','#9B48A1','#73317A','#4D2154',
-      "black"]
+      '#FAB1F7', '#EE82EE', '#C463C7', '#9B48A1', '#73317A', '#4D2154',
+      "black"
+    ],
+    classesName: ['class1', 'class2', 'class3', 'class4', 'class5'],
+    classesProg: [0, 0, 0, 0, 0]
   },
 
   /**
@@ -53,7 +59,14 @@ Page({
       withShareTicket: true
     });
 
-    
+    // 加载模型
+    classifier.resetClassifier();
+    classifier.loadModels().then(() => {
+      this.setData({
+        status: '模型加载完成！'
+      });
+      this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
+    });
   },
 
   /**
@@ -69,8 +82,7 @@ Page({
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function () {
-  },
+  onShow: function () {},
 
   /**
    * 生命周期函数--监听页面隐藏
@@ -121,6 +133,7 @@ Page({
   touchMove: function (e) {
     if (begin) {
       this.lineAddPoint(e.touches[0].x, e.touches[0].y);
+      this.recordPredictStroke(e.touches[0].x, e.touches[0].y);
       this.draw(true);
       curDrawArr.push({
         x: e.touches[0].x,
@@ -136,11 +149,26 @@ Page({
       color: this.data.currentColor,
       lineWidth: this.data.lineWidthArr[this.data.curWidthIndex],
     });
+    // console.log(curDrawArr);
     curDrawArr = [];
     this.lineEnd();
+    predictStroke[predictStroke.length - 1][2] = 1.0;
+    classifier.classify(predictStroke).then((res) => {
+      // console.log(res);
+      let probs = res.probs;
+      for (let i = 0; i < probs.length; i++) {
+        probs[i] = Number(probs[i] * 100).toFixed(1);
+      }
+      this.setData({
+        classesName: res.names,
+        classesProg: probs
+      });
+      // predictStroke = [];
+    });
+
+    this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
   },
 
-  
 
   // 点击设置线条宽度
   clickChangeWidth: function (e) {
@@ -164,6 +192,13 @@ Page({
     this.fillBackground(this.context);
     this.draw();
     drawInfos = [];
+    lastCoord = null;
+    predictStroke = [];
+    this.setData({
+      classesName: ['class1', 'class2', 'class3', 'class4', 'class5'],
+      classesProg: [0, 0, 0, 0, 0]
+    });
+    classifier.resetClassifier();
     this.init();
   },
 
@@ -214,9 +249,9 @@ Page({
     // 截图用户绘制的canvaas
     this.store("firstCanvas", filePath => {
       // 生成海报并分享
-     
-          that.sharePost(filePath);
-       
+
+      that.sharePost(filePath);
+
     });
   },
 
@@ -329,28 +364,28 @@ Page({
   // canvas上下文设置背景为白色
   fillBackground: function (context) {
     context.setFillStyle(bgColor);
-    context.fillRect(0, 0, 500, 500);      //TODO context的宽和高待定
+    context.fillRect(0, 0, 500, 500); //TODO context的宽和高待定
     context.fill();
   },
 
-  
-   // 预览
-  pageView: function(){
+
+  // 预览
+  pageView: function () {
     wx.canvasToTempFilePath({
       canvasId: 'firstCanvas',
       success: function (res) {
         wx.previewImage({
           current: res.tempFilePath,
           urls: [res.tempFilePath],
-          success:function(res){
-            
+          success: function (res) {
+
           },
-          fail:function(res){
-            
+          fail: function (res) {
+
           },
         });
       },
-      fail:function(res){
+      fail: function (res) {
         wx.showToast({
           title: '保存失败',
           icon: 'none'
@@ -358,12 +393,50 @@ Page({
       }
     }, this)
   },
-  
+
   // 分享海报
   sharePost: function (filePath) {
     let url = `/pages/share/share?imgUrl=${filePath}&levelId=${this.data.levelId}`;
     wx.navigateTo({
       url: url
     })
+  },
+
+  // 记录笔画偏移量数组，用于预测分类
+  recordPredictStroke: function (x, y) {
+    var posX = x;
+    var posY = y;
+    if (lastCoord !== null) {
+      // Calc the delta.
+      let xDelta = posX - lastCoord[0];
+      let yDelta = lastCoord[1] - posY; // Reverse the y coordinate.
+      // Normalization.
+      xDelta = Number((xDelta / DRAW_SIZE[0]).toFixed(10));
+      yDelta = Number((yDelta / DRAW_SIZE[1]).toFixed(10));
+      // xDelta = xDelta / DRAW_SIZE[0];
+      // yDelta = yDelta / DRAW_SIZE[1];
+      if (predictStroke.length > 0) {
+        if (xDelta === 0.0 && predictStroke[predictStroke.length - 1][0] === 0.0) {
+          // Merge if only move in y axis.
+          predictStroke[predictStroke.length - 1][1] += yDelta;
+          lastCoord = [posX, posY];
+          return;
+        }
+        if (yDelta === 0.0 && predictStroke[predictStroke.length - 1][1] === 0.0) {
+          // Merge if only move in x axis.
+          predictStroke[predictStroke.length - 1][0] += xDelta;
+          lastCoord = [posX, posY];
+          return;
+        }
+      }
+      // Ignore < DRAW_PREC.
+      if (Math.abs(xDelta) >= DRAW_PREC || Math.abs(yDelta) >= DRAW_PREC) {
+        predictStroke.push([xDelta, yDelta, 0.0]);
+        lastCoord = [posX, posY];
+      }
+      // console.log(predictStroke)
+    } else {
+      lastCoord = [posX, posY];
+    }
   }
 })

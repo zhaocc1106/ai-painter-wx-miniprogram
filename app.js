@@ -1,6 +1,37 @@
 //app.js
+var fetchWechat = require('fetch-wechat');
+var tf = require('@tensorflow/tfjs-core');
+var cpu = require('@tensorflow/tfjs-backend-cpu');
+var webgl = require('@tensorflow/tfjs-backend-webgl');
+var plugin = requirePlugin('tfjsPlugin');
+const regeneratorRuntime = require('regenerator-runtime')
+
 App({
   onLaunch: function () {
+    platform = wx.getSystemInfoSync().platform;
+    console.log(platform);
+    if (platform == 'android') {
+      plugin.configPlugin({
+        // polyfill fetch function
+        fetchFunc: fetchWechat.fetchFunc(),
+        // inject tfjs runtime
+        tf,
+        // inject backend
+        cpu
+      });
+    } else {
+    plugin.configPlugin({
+      // polyfill fetch function
+      fetchFunc: fetchWechat.fetchFunc(),
+      // inject tfjs runtime
+      tf,
+      // inject backend
+      webgl,
+      // provide webgl canvas
+      canvas: wx.createOffscreenCanvas()
+    });
+  }
+    
     // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())

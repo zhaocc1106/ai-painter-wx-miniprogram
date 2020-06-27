@@ -9,8 +9,9 @@
 }
 
 .btn-container .icon{
-  width: 50rpx;
-  height: 50rpx;
+  margin-top: 5rpx;
+  width: 45rpx;
+  height: 40rpx;
   z-index: 3;
 }
 
@@ -19,7 +20,8 @@
   line-height: 50rpx;
   text-align: left;
   margin-left: 5rpx;
-  font-size: 30rpx;
+  font-size: 0.75em;
+  color: gray;
   z-index: 3;
 }
 
