@@ -1,0 +1,272 @@
+page{
+  height: 100%;
+  width:100%;
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+/* 显示的题目 */
+
+.container .question {
+  width: 100%;
+  height: 5%;
+  background: #f0efef;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  color: #fb21a1;
+  box-shadow: 2rpx 5rpx 2rpx silver;
+}
+
+/* 刷新按钮 */
+
+.container .question .userinfo-avatar {
+  height: 50rpx;
+  width: 50rpx;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.container .question text {
+  margin: auto 10rpx auto 20rpx;
+  font-size: 0.75em;
+}
+
+.container .question .refresh-btn {
+  width: 50rpx;
+  height: 50rpx;
+  transform: scaleX(-1);
+}
+
+/* 中间画板 */
+
+.container .palette {
+  width: 100%;
+  height: 60%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 2rpx 5rpx 2rpx silver;
+}
+
+/* 按钮的panel */
+
+.container .option-panel {
+  padding-bottom: 10rpx;
+  font-size: 1em;
+  text-align: center;
+  background: #f0efef;
+  width: 100%;
+  height: 35%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 面板中的行 */
+
+.option-panel .option-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-content: center;
+}
+
+#firstRow{
+  height: 20%;
+}
+
+#secondRow{
+  height: 25%;
+}
+
+#thirdRow{
+  height: 25%;
+}
+
+#forthRow{
+  height: 20%;
+}
+/* 面板中的第一行 */
+
+.option-panel #firstRow .width-container {
+  width: 50%;
+  padding-top: 10rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+/* 笔触大小四个字 */
+.option-panel #firstRow .width-container text {
+  margin-left: 25rpx;
+  font-size: 0.75em;
+  color: gray;
+}
+
+.brush-point{
+  width: 52rpx;
+  height: 65rpx;
+}
+
+.option-panel #firstRow .useless {
+  width: 30%;
+}
+
+/* 清除按钮 */
+.option-panel #firstRow .icon-text {
+  padding-top: 10rpx;
+  width: 20%;
+  display: flex;
+  align-items: center;
+  font-size: 0.75em;
+  color: gray;
+}
+
+/* option-panel的第二行 */
+
+.option-panel #secondRow {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  align-items: center;
+}
+
+/*选颜色*/
+
+/* 左边的箭头 */
+
+.option-panel #secondRow .color-slecotr-left {
+  width: 0;
+  height: 0;
+  margin-left: 3%;
+  border-top: 25rpx solid transparent;
+  border-right: 30rpx solid #c9c8c8;
+  border-bottom: 25rpx solid transparent;
+}
+
+/* 右边的箭头 */
+
+.option-panel #secondRow .color-slecotr-right {
+  width: 0;
+  height: 0;
+  margin-right: 3%;
+  border-top: 25rpx solid transparent;
+  border-left: 30rpx solid #c9c8c8;
+  border-bottom: 25rpx solid transparent;
+}
+
+/* 装颜色盒子的srcoll-view */
+
+.option-panel #secondRow scroll-view {
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  align-content: flex-end;
+}
+
+.option-panel #secondRow scroll-view .color-box {
+  display: inline-block;
+  width: 60rpx;
+  height: 100%;
+  margin: 0 10rpx 0 10rpx;
+}
+
+/* option-panel的第三行 */
+
+.option-panel #thirdRow {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  align-items: center;
+}
+
+/*选颜色*/
+
+/* 左边的箭头 */
+
+.option-panel #thirdRow .color-slecotr-left {
+  width: 0;
+  height: 0;
+  margin-left: 3%;
+  border-top: 25rpx solid transparent;
+  border-right: 30rpx solid #c9c8c8;
+  border-bottom: 25rpx solid transparent;
+}
+
+/* 右边的箭头 */
+
+.option-panel #thirdRow .color-slecotr-right {
+  width: 0;
+  height: 0;
+  margin-right: 3%;
+  border-top: 25rpx solid transparent;
+  border-left: 30rpx solid #c9c8c8;
+  border-bottom: 25rpx solid transparent;
+}
+
+/* 装颜色盒子的srcoll-view */
+
+.option-panel #thirdRow scroll-view {
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  align-content: flex-end;
+}
+
+.option-panel #thirdRow scroll-view .radio-group {
+  display: flex;
+  flex-direction: row;
+  width: 60rpx;
+  height: 100%;
+  margin: 0 10rpx 0 10rpx;
+}
+
+.option-panel #thirdRow scroll-view .radio {
+  width: 50rpx;
+  height: 100%;
+  margin-left: 35rpx;
+  margin-right: 45rpx;
+}
+
+.option-panel #thirdRow scroll-view .radio .text {
+  font-size: 28rpx;
+}
+
+/* 第四行 */
+.option-panel #forthRow .share-btn{
+  background: #ffcc01;
+}
+
+/* 生成佳作的按钮 */
+
+.option-panel .share-btn {
+  width: 90%;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 34rpx;
+  color: #000;
+}
+
+/*----------------------------------------------------------------------*/
+
+canvas {
+  background: black;
+  width: 100%;
+  height: 100%;
+  border: 1rpx solid #ebebeb;
+  border-radius: 3rpx;
+}

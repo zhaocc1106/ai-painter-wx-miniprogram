@@ -3,20 +3,32 @@
 
 const app = getApp();
 
-const classifier = require('../../components/aiModels/classifier/classifier.js');
+const autoPainter = require('../../components/aiModels/autoPainter/autoPainter.js');
+const fetchWechat = require('fetch-wechat');
+const tf = require('@tensorflow/tfjs-core');
+const cpu = require('@tensorflow/tfjs-backend-cpu');
+const webgl = require('@tensorflow/tfjs-backend-webgl');
+const plugin = requirePlugin('tfjsPlugin');
 
-const DRAW_SIZE = [255, 255];
-const DRAW_PREC = 0.03678;
+// 不同图像尺寸大小
+const DRAW_SIZE = [
+  [61.25, 61.25],
+  [122.5, 122.5],
+  [183.75, 183.75],
+  [255, 255]
+];
+const DRAW_PREC = 0.02;
 
-var drawInfos = [];
-var startX = 0;
-var startY = 0;
-var bgColor = "white";
-var begin = false;
-var curDrawArr = [];
+var drawInfos = []
+var startX = 0
+var startY = 0
+var bgColor = "white"
+var begin = false
+var curDrawArr = []
 var lastCoord = null; // 记录画笔上一个坐标
+let beginPosition = null; // 记录后续笔画的其实坐标
 var predictStroke = []; // 用于预测的笔画偏移量数组
-var drawing = false; // 正在画画
+var predicting = false; // 正在预测
 
 Page({
   /**
@@ -24,13 +36,15 @@ Page({
    */
   data: {
     levelId: 0,
-    status: "正在努力加载模型...",
+    status: "正在努力加载模型ᕙ༼ ͝°益° ༽ᕗ",
     hidden: true, // 是否隐藏生成海报的canvas
     bgColor: bgColor,
     currentColor: 'black',
     avatarUrl: "",
+    curSizeIndex: 1,
+    imgSizeArr: [1, 5, 10, 20],
     curWidthIndex: 0,
-    lineWidthArr: [2, 5, 10, 20],
+    lineWidthArr: [3, 5, 10, 20],
     avaliableColors: ["black", "red", "blue", "gray", "#ff4081",
       "#009681", "#259b24", "green", "#0000CD", "#1E90FF", "#ADD8E6", "#FAEBD7", "#FFF0F5", // orange
       '#FFEBA3', '#FFDE7A', '#FFCE52', '#FFBB29', '#FFA500', '#D98600', '#B36800', '#8C4D00', '#663500',
@@ -48,8 +62,27 @@ Page({
       '#FAB1F7', '#EE82EE', '#C463C7', '#9B48A1', '#73317A', '#4D2154',
       "black"
     ],
-    classesName: ['class1', 'class2', 'class3', 'class4', 'class5'],
-    classesProg: [0, 0, 0, 0, 0]
+    avaliableModels: [{
+        name: 'apple',
+        value: '苹果',
+        checked: true
+      },
+      {
+        name: 'flower',
+        value: '花朵',
+        checked: false
+      },
+      {
+        name: 'butterfly',
+        value: '蝴蝶',
+        checked: false
+      },
+      {
+        name: 'sun',
+        value: '太阳',
+        checked: false
+      },
+    ],
   },
 
   /**
@@ -60,13 +93,15 @@ Page({
       withShareTicket: true
     });
 
-    // 加载模型
-    classifier.resetClassifier();
-    classifier.loadModels().then(() => {
-      this.setData({
-        status: '模型加载完成！'
-      });
-      this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
+    plugin.configPlugin({
+      // polyfill fetch function
+      fetchFunc: fetchWechat.fetchFunc(),
+      // inject tfjs runtime
+      tf,
+      // inject backend
+      webgl,
+      // provide webgl canvas
+      canvas: wx.createOffscreenCanvas()
     });
   },
 
@@ -78,6 +113,32 @@ Page({
     this.init();
     this.fillBackground(this.context);
     this.draw();
+
+    wx.showLoading({
+      title: '加载模型...',
+      mask: true,
+    });
+    autoPainter.loadModels().then((res) => {
+      wx.hideLoading();
+      if (res) {
+        this.setData({
+          status: '给我一个起始笔画吧，不要太长哦！(⊙ᗜ⊙)'
+        });
+        this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
+        wx.showToast({
+          title: '加载完成',
+        })
+      } else {
+        this.setData({
+          status: '模型加载超时（´□｀川）'
+        });
+        wx.showModal({
+          title: '加载失败',
+          content: '选择其他模型试试吧',
+          showCancel: false,
+        });
+      }
+    });
   },
 
   /**
@@ -123,9 +184,13 @@ Page({
   /*--------------------- UI事件 --------------------------------------------------- */
   // 绘制开始 手指开始按到屏幕上
   touchStart: function (e) {
-    drawing = true;
-    this.lineBegin(e.touches[0].x, e.touches[0].y)
+    if (predicting) {
+      return;
+    }
+
+    this.lineBegin(e.touches[0].x, e.touches[0].y);
     this.recordPredictStroke(e.touches[0].x, e.touches[0].y);
+    this.draw(true);
     curDrawArr.push({
       x: e.touches[0].x,
       y: e.touches[0].y
@@ -134,6 +199,10 @@ Page({
 
   // 绘制中 手指在屏幕上移动
   touchMove: function (e) {
+    if (predicting) {
+      return;
+    }
+
     if (begin) {
       this.lineAddPoint(e.touches[0].x, e.touches[0].y);
       this.recordPredictStroke(e.touches[0].x, e.touches[0].y);
@@ -147,36 +216,59 @@ Page({
 
   // 绘制结束 手指抬起
   touchEnd: function () {
-    drawing = false;
+    if (predicting) {
+      return;
+    }
+
     drawInfos.push({
       drawArr: curDrawArr,
       color: this.data.currentColor,
       lineWidth: this.data.lineWidthArr[this.data.curWidthIndex],
     });
-    // console.log(curDrawArr);
+
+    // 后续笔画的起始坐标
+    beginPosition = [curDrawArr[curDrawArr.length - 1]['x'], curDrawArr[curDrawArr.length - 1]['y']];
+
     curDrawArr = [];
     this.lineEnd();
-    predictStroke[predictStroke.length - 1][2] = 1.0;
-    classifier.classify(predictStroke, (res) => {
-      if (drawing) {
-        console.log('Is drawing, ignore it.');
-        return;
-      }
-      // console.log(res);
-      let probs = res.probs;
-      for (let i = 0; i < probs.length; i++) {
-        probs[i] = Number(probs[i] * 100).toFixed(1);
-      }
-      this.setData({
-        classesName: res.names,
-        classesProg: probs
-      });
-      // predictStroke = [];
+
+    this.setData({
+      status: '想象中［(－－)］zzz'
     });
 
-    this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
+    if (predictStroke.length <= 1) {
+      this.setData({
+        status: '笔画太少了(╥╯^╰╥)'
+      });
+      return;
+    }
+
+    predicting = true; // 开始预测与绘制
+    autoPainter.generate(predictStroke).then(followStroke => {
+      if (followStroke) {
+        console.log('The followStroke length: ' + followStroke.length);
+        this.setData({
+          status: '绘制中(∪｡∪)｡｡｡zzz'
+        });
+        this.drawFollowStroke(followStroke, beginPosition); // 绘制后续笔画
+        predictStroke = [];
+        lastCoord = null;
+      } else {
+        this.setData({
+          status: '我没想出来(╥╯^╰╥)'
+        });
+        predicting = false;
+      }
+    });
   },
 
+  // 点击图像大小
+  clickChangeSize: function (e) {
+    let index = e.currentTarget.dataset.index;
+    this.setData({
+      curSizeIndex: index
+    });
+  },
 
   // 点击设置线条宽度
   clickChangeWidth: function (e) {
@@ -200,14 +292,8 @@ Page({
     this.fillBackground(this.context);
     this.draw();
     drawInfos = [];
-    lastCoord = null;
-    predictStroke = [];
-    this.setData({
-      classesName: ['class1', 'class2', 'class3', 'class4', 'class5'],
-      classesProg: [0, 0, 0, 0, 0]
-    });
-    classifier.resetClassifier();
     this.init();
+    predicting = false;
   },
 
   // 点击撤销上一步
@@ -260,6 +346,39 @@ Page({
 
       that.sharePost(filePath);
 
+    });
+  },
+
+  modelChange: async function (e) {
+    this.setData({
+      status: '正在努力加载模型ᕙ༼ ͝°益° ༽ᕗ'
+    });
+
+    console.log(e.detail.value);
+    wx.showLoading({
+      title: '加载模型...',
+      mask: true,
+    });
+    await autoPainter.loadModels(e.detail.value).then((res) => {
+      wx.hideLoading();
+      if (res) {
+        this.setData({
+          status: '给我一个起始笔画吧，不要太长哦！(⊙ᗜ⊙)'
+        });
+        this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
+        wx.showToast({
+          title: '加载完成',
+        });
+      } else {
+        this.setData({
+          status: '模型加载超时（´□｀川）'
+        });
+        wx.showModal({
+          title: '加载失败',
+          content: '选择其他模型试试吧',
+          showCancel: false,
+        });
+      }
     });
   },
 
@@ -410,7 +529,7 @@ Page({
     })
   },
 
-  // 记录笔画偏移量数组，用于预测分类
+  // 记录笔画偏移量数组，用于预测后续笔画
   recordPredictStroke: function (x, y) {
     var posX = x;
     var posY = y;
@@ -419,10 +538,8 @@ Page({
       let xDelta = posX - lastCoord[0];
       let yDelta = lastCoord[1] - posY; // Reverse the y coordinate.
       // Normalization.
-      xDelta = Number((xDelta / DRAW_SIZE[0]).toFixed(10));
-      yDelta = Number((yDelta / DRAW_SIZE[1]).toFixed(10));
-      // xDelta = xDelta / DRAW_SIZE[0];
-      // yDelta = yDelta / DRAW_SIZE[1];
+      xDelta = xDelta / DRAW_SIZE[this.data.curSizeIndex][0];
+      yDelta = yDelta / DRAW_SIZE[this.data.curSizeIndex][1];
       if (predictStroke.length > 0) {
         if (xDelta === 0.0 && predictStroke[predictStroke.length - 1][0] === 0.0) {
           // Merge if only move in y axis.
@@ -439,12 +556,111 @@ Page({
       }
       // Ignore < DRAW_PREC.
       if (Math.abs(xDelta) >= DRAW_PREC || Math.abs(yDelta) >= DRAW_PREC) {
-        predictStroke.push([xDelta, yDelta, 0.0]);
+        predictStroke.push([xDelta, yDelta, 0.0, 0.0]);
         lastCoord = [posX, posY];
       }
       // console.log(predictStroke)
     } else {
       lastCoord = [posX, posY];
+    }
+  },
+
+  // 绘制预测的后续笔画
+  drawFollowStroke: async function (inks, beginPos) {
+    console.log('drawFollowStroke');
+    // 1, generate coords by deltas.
+    let inkCoords = [
+      [beginPos[0] / DRAW_SIZE[this.data.curSizeIndex][0], beginPos[1] / DRAW_SIZE[this.data.curSizeIndex][1], 0, 0]
+    ];
+    for (let ink in inks) {
+      let posX = inkCoords[ink][0] + inks[ink][0];
+      let posY = inkCoords[ink][1] - inks[ink][1];
+      let endFlag = inks[ink][2];
+      let completeFlag = inks[ink][3];
+      inkCoords.push([posX, posY, endFlag, completeFlag]);
+    }
+    // 2, zoom in to DRAW_SIZE scale.
+    for (let ink in inkCoords) {
+      inkCoords[ink][0] *= DRAW_SIZE[this.data.curSizeIndex][0];
+      inkCoords[ink][1] *= DRAW_SIZE[this.data.curSizeIndex][1];
+    }
+
+    // console.log(inkCoords);
+    // 3. Draw every stroke.
+    let stroke = [];
+    for (let ink in inkCoords) {
+      // Check if is complete ink.
+      if (inkCoords[ink][3] > 0.5) {
+        await this.drawStroke(stroke);
+        stroke = [];
+        predicting = false; // 预测与绘制完毕
+        this.setData({
+          status: '我画完了(⊙ᗜ⊙)'
+        });
+        return;
+      }
+      // Check if is stroke end ink.
+      if (inkCoords[ink][2] > 0.5) {
+        // It's the stroke end ink, draw current stroke.
+        stroke.push([inkCoords[ink][0], inkCoords[ink][1]]);
+        await this.drawStroke(stroke);
+        stroke = [];
+      } else {
+        // It's one point in stroke, add into current stroke.
+        stroke.push([inkCoords[ink][0], inkCoords[ink][1]]);
+      }
+    }
+    if (stroke.length !== 0) {
+      // There has been left inks.
+      await this.drawStroke(stroke);
+    }
+    predicting = false; // 预测与绘制完毕
+    this.setData({
+      status: '我画完了(⊙ᗜ⊙)'
+    });
+  },
+
+  // 绘制一笔
+  drawStroke: async function (stroke) {
+    // 睡眠
+    let sleep = function (time) {
+      let systemInfo = wx.getSystemInfoSync();
+      if (systemInfo.platform == 'android') {
+        // android sleep will very slow.
+        return;
+      }
+      return new Promise((resolve) => setTimeout(resolve, time));
+    }
+    // 欧氏距离
+    let eucDistance = function (x0, x1, y0, y1) {
+      return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5;
+    }
+
+    // 随机颜色
+    this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
+
+    if (stroke.length === 1) {
+      console.log("Only have one ink.");
+      this.lineAddPoint(stroke[0][0], stroke[0][1]);
+      this.draw(true);
+      await sleep(10);
+      return;
+    }
+
+    for (let ink in stroke) {
+      if (ink == 0) {
+        continue;
+      }
+      this.lineAddPoint(stroke[ink][0], stroke[ink][1]);
+      this.draw(true);
+
+      // If euclidean distance of two ink < 3, add path later and don't delay.
+      // console.log(eucDistance(stroke[ink - 1][0], stroke[ink][0], stroke[ink - 1][1], stroke[ink][1]));
+      if (eucDistance(stroke[ink - 1][0], stroke[ink][0], stroke[ink - 1][1], stroke[ink][1]) < 3) {
+        console.log("If euclidean distance of two ink < 3, add path later and don't delay.");
+      } else {
+        await sleep(10);
+      }
     }
   }
 })

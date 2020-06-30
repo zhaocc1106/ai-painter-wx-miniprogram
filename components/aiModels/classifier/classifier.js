@@ -4,16 +4,14 @@
 /* 加载tensorflow库 */
 const tf = require('@tensorflow/tfjs-core')
 const tfLayers = require('@tensorflow/tfjs-layers');
-const {
-  time
-} = require('@tensorflow/tfjs-core');
+var plugin = requirePlugin('tfjsPlugin');
 
 /* 常量 */
 const MODEL_URL = 'https://6169-ai-painter-7q1db-1302478925.tcb.qcloud.la/quick-draw-classifier/model.json'
 const CLASSES_NAME_CLOUD_ID = 'cloud://ai-painter-7q1db.6169-ai-painter-7q1db-1302478925/quick-draw-classifier/classes_names_zh'
 
 /* 全局变量 */
-let model = undefined; // 模型
+let model = model; // 模型
 let classNames = null; // 记录所有的类型名
 
 /**
@@ -29,9 +27,11 @@ async function tensorPreprocess(inks) {
 
 /**
  * 加载模型
+ * @returns true for success, false for failed.
  */
-async function loadModels(globalData) {
+async function loadModels() {
   console.log('Loading models...');
+  console.log(wx.env.USER_DATA_PATH);
   // tf.tensor([1, 2]).print();
 
   /* 下载并读取类型名文件 */
@@ -61,8 +61,23 @@ async function loadModels(globalData) {
 
   console.time('LoadModel');
 
-  /* 加载模型，预热模型 */
-  model = await tfLayers.loadLayersModel(MODEL_URL);
+  /* 加载模型 */
+  const fileStorageHandler = plugin.fileStorageIO('classifier', wx.getFileSystemManager());
+
+  try {
+    model = await tfLayers.loadLayersModel(fileStorageHandler); // 先尝试本地加载模型文件
+  } catch (err) {
+    console.log('Load model from local failed: ' + err);
+    try {
+      model = await tfLayers.loadLayersModel(MODEL_URL); // 本地加载失败，从云顿加载模型文件
+      // model.save(fileStorageHandler); // 模型文件保存到本地
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+  }
+
+  /* 预热模型 */
   let warmupStroke = [
     [0., 0., 0.]
   ];
@@ -74,6 +89,7 @@ async function loadModels(globalData) {
   model.resetStates();
 
   console.timeEnd('LoadModel');
+  return true;
 }
 
 /**
@@ -119,11 +135,12 @@ function getClassNames(indices) {
 
 /**
  * 对笔画进行分类
- * @param {*} predictStroke 笔画
- * @returns top5分类名与概率大小
+ * @param {Array} predictStroke 笔画
+ * @param {function} succCb 成功的回调函数，参数obj包含两个属性，probs代表所有类型概率，names代表所有类型名
+ * @param {function} failCb 失败的回调函数，参数obj包含一个属性，errInfo代表错误描述
  */
 async function classify(predictStroke, succCb, failCb) {
-  if (model === undefined) {
+  if (model === null) {
     console.log('Model unloaded!');
     if (failCb) {
       failCb('Model unloaded!');
