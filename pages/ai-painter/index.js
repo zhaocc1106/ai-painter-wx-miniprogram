@@ -117,7 +117,7 @@ Page({
       title: '加载模型...',
       mask: true,
     });
-    autoPainter.loadModels().then((res) => {
+    autoPainter.loadModels('apple').then((res) => {
       wx.hideLoading();
       if (res) {
         this.setData({
