@@ -16,6 +16,8 @@ tensorflowjs_converter --input_format keras model.h5 ./
 转换后会生成model.json文件以及group bin文件，分别记录网络结构以及参数值。<br>
 实际应用模型时可能需要修改一些地方，比如修改model.json的input layer的batch size为1；修改dropout training参数为false。<br>
 当然也可以在保存H5模型文件前做修改。
+#### 演示
+<img src="https://github.com/zhaocc1106/ai-painter-wx-miniprogram/blob/master/images/ai-classifier.gif"  alt="ai-classifier">
 
 
 ## quick_draw_autopainter模型
@@ -39,6 +41,9 @@ tensorflowjs_converter --input_format keras model.h5 ./
 3. 训练数据不够随机性<br>
 
 后续再继续优化
+#### 演示
+<img src="https://github.com/zhaocc1106/ai-painter-wx-miniprogram/blob/master/images/ai-painter.gif"  alt="ai-painter">
+
 
 ## 小程序中部署tensorflow模型
 参考官方说明https://github.com/tensorflow/tfjs-wechat
