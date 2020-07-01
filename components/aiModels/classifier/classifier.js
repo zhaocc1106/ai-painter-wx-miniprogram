@@ -11,7 +11,7 @@ const MODEL_URL = 'https://6169-ai-painter-7q1db-1302478925.tcb.qcloud.la/quick-
 const CLASSES_NAME_CLOUD_ID = 'cloud://ai-painter-7q1db.6169-ai-painter-7q1db-1302478925/quick-draw-classifier/classes_names_zh'
 
 /* 全局变量 */
-let model = model; // 模型
+let model = null; // 模型
 let classNames = null; // 记录所有的类型名
 
 /**
@@ -30,6 +30,10 @@ async function tensorPreprocess(inks) {
  * @returns true for success, false for failed.
  */
 async function loadModels() {
+  if (model != null) {
+    return true;
+  }
+
   console.log('Loading models...');
   console.log(wx.env.USER_DATA_PATH);
   // tf.tensor([1, 2]).print();

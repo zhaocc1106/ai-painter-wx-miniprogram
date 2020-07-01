@@ -1,0 +1,14 @@
+{
+  "navigationBarTitleText": "AI 涂鸦",
+  "navigationBarBackgroundColor": "#ffcc01",
+	"navigationBarTextStyle": "black",
+	"backgroundColor": "#ffffff",
+	"backgroundTextStyle": "dark",
+	"enablePullDownRefresh": false,
+	"disableScroll": true,
+  "usingComponents": {
+    "my-divider": "/components/divider/index",
+    "my-grids": "/components/grids/index",
+    "my-grid": "/components/grid/index"
+  }
+}

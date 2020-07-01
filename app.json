@@ -1,7 +1,8 @@
 {
   "pages": [
-    "pages/ai-classifier/index",
+    "pages/index/index",
     "pages/ai-painter/index",
+    "pages/ai-classifier/index",
     "pages/share/share"
   ],
   "window": {

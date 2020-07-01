@@ -1,5 +1,4 @@
-// pages/games/draw.js
-// https://github.com/ETRick/MiniProgram-Draw
+// pages/ai-classifier/index.js
 
 const app = getApp();
 
@@ -35,7 +34,7 @@ Page({
     currentColor: 'black',
     avatarUrl: "",
     curWidthIndex: 0,
-    lineWidthArr: [2, 5, 10, 20],
+    lineWidthArr: [3, 5, 10, 20],
     avaliableColors: ["black", "red", "blue", "gray", "#ff4081",
       "#009681", "#259b24", "green", "#0000CD", "#1E90FF", "#ADD8E6", "#FAEBD7", "#FFF0F5", // orange
       '#FFEBA3', '#FFDE7A', '#FFCE52', '#FFBB29', '#FFA500', '#D98600', '#B36800', '#8C4D00', '#663500',

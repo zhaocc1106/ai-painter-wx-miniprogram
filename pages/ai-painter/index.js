@@ -1,5 +1,4 @@
-// pages/games/draw.js
-// https://github.com/ETRick/MiniProgram-Draw
+// pages/ai-painter/index.js
 
 const app = getApp();
 
@@ -122,7 +121,7 @@ Page({
       wx.hideLoading();
       if (res) {
         this.setData({
-          status: '给我一个起始笔画吧，不要太长哦！(⊙ᗜ⊙)'
+          status: '给我一个起始笔画吧，' + (Math.random() > 0.5 ? '不要太长哦！(⊙ᗜ⊙)' : '短一些会更好！(⊙ᗜ⊙)')
         });
         this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
         wx.showToast({
@@ -363,7 +362,7 @@ Page({
       wx.hideLoading();
       if (res) {
         this.setData({
-          status: '给我一个起始笔画吧，不要太长哦！(⊙ᗜ⊙)'
+          status: '给我一个起始笔画吧，' + (Math.random() > 0.5 ? '不要太长哦！(⊙ᗜ⊙)' : '短一些会更好！(⊙ᗜ⊙)')
         });
         this.setCurrentColor(this.data.avaliableColors[Math.floor((Math.random() * this.data.avaliableColors.length))]);
         wx.showToast({
@@ -595,7 +594,7 @@ Page({
         stroke = [];
         predicting = false; // 预测与绘制完毕
         this.setData({
-          status: '我画完了(⊙ᗜ⊙)'
+          status: '我画完了(⊙ᗜ⊙)' + (Math.random() > 0.5 ? '不满意的话尝试调整或缩短一下起始笔画吧' : '')
         });
         return;
       }
@@ -616,7 +615,7 @@ Page({
     }
     predicting = false; // 预测与绘制完毕
     this.setData({
-      status: '我画完了(⊙ᗜ⊙)'
+      status: '我画完了(⊙ᗜ⊙)，不满意的话尝试调整或缩短一下起始笔画吧'
     });
   },
 

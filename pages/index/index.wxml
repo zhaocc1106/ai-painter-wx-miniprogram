@@ -1,0 +1,16 @@
+<view class="container">
+	<my-divider text="简介" />
+
+	<view id='intro'>
+		<text>
+    基于quickdraw数据集训练的涂鸦分类以及自动涂鸦小模型，代码仓库：https://github.com/zhaocc1106/ai-painter-wx-miniprogram
+	  </text>
+	</view>
+
+	<my-divider text="页面" />
+
+	<my-grids col="2">
+		<my-grid thumb="/images/games/common/think.png" label="AI 猜图" data-dest="ai-classifier" bind:click="jumpTo" />
+		<my-grid thumb="/images/games/common/idea.png" label="AI 画画" data-dest="ai-painter" bind:click="jumpTo" />
+	</my-grids>
+</view>
