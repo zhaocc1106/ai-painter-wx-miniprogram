@@ -242,8 +242,13 @@ Page({
       return;
     }
 
+    wx.showLoading({
+      title: Math.random() > 0.5 ? '想象中' : '冥思中',
+      mask: true
+    })
     predicting = true; // 开始预测与绘制
     autoPainter.generate(predictStroke).then(followStroke => {
+      wx.hideLoading();
       if (followStroke) {
         console.log('The followStroke length: ' + followStroke.length);
         this.setData({
@@ -253,6 +258,7 @@ Page({
         predictStroke = [];
         lastCoord = null;
       } else {
+        wx.hideLoading();
         this.setData({
           status: '我没想出来(╥╯^╰╥)'
         });
