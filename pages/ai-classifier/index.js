@@ -8,6 +8,7 @@ const tf = require('@tensorflow/tfjs-core');
 const cpu = require('@tensorflow/tfjs-backend-cpu');
 const webgl = require('@tensorflow/tfjs-backend-webgl');
 const plugin = requirePlugin('tfjsPlugin');
+const util = require('../../utils/util.js')
 
 const DRAW_SIZE = [255, 255];
 const DRAW_PREC = 0.03;
@@ -20,7 +21,9 @@ var begin = false;
 var curDrawArr = [];
 var lastCoord = null; // 记录画笔上一个坐标
 var predictStroke = []; // 用于预测的笔画偏移量数组
+var drawing = false; // 正在画
 var classifing = false; // 正在猜
+const promiseObj = new util.promiseContainer(); // 只响应最后一次promise
 
 Page({
   /**
@@ -179,6 +182,7 @@ Page({
     if (classifing) {
       return;
     }
+    drawing = true;
 
     this.lineBegin(e.touches[0].x, e.touches[0].y);
     this.recordPredictStroke(e.touches[0].x, e.touches[0].y);
@@ -194,6 +198,7 @@ Page({
     if (classifing) {
       return;
     }
+    drawing = true;
 
     if (begin) {
       this.lineAddPoint(e.touches[0].x, e.touches[0].y);
@@ -208,6 +213,7 @@ Page({
 
   // 绘制结束 手指抬起
   touchEnd: function () {
+    drawing = false;
     if (classifing) {
       return;
     }
@@ -225,27 +231,40 @@ Page({
     this.setData({
       status: Math.random() > 0.5 ? '正在思索中［(－－)］zzz' : '绞尽脑汁中［(－－)］zzz',
     });
-    classifing = true;
-    classifier.classify(predictStroke, (res) => {
-      // console.log(res);
-      let probs = res.probs;
-      for (let i = 0; i < probs.length; i++) {
-        probs[i] = Number(probs[i] * 100).toFixed(1);
-      }
 
-      classifing = false;
-      this.setData({
-        status: '我猜出来了！(⊙ᗜ⊙)'
-      });
-      this.setData({
-        classesName: res.names,
-        classesProg: probs
-      });
-      // predictStroke = [];
-    }, res => {
-      classifing = false;
-      this.setData({
-        status: '我猜不出来(╥╯^╰╥)',
+    promiseObj.addPromise(new Promise((resolve) => setTimeout(resolve, 800)), () => {
+      if (drawing) {
+        console.log('Drawing, do not predict.');
+        return true;
+      }
+      classifing = true;
+      wx.showLoading({
+        title: Math.random() > 0.5 ? '冥思中' : '思考中',
+        mask: true
+      })
+      classifier.classify(predictStroke, (res) => {
+        // console.log(res);
+        wx.hideLoading();
+        let probs = res.probs;
+        for (let i = 0; i < probs.length; i++) {
+          probs[i] = Number(probs[i] * 100).toFixed(1);
+        }
+
+        classifing = false;
+        this.setData({
+          status: '我猜出来了！(⊙ᗜ⊙)'
+        });
+        this.setData({
+          classesName: res.names,
+          classesProg: probs
+        });
+        // predictStroke = [];
+      }, res => {
+        wx.hideLoading();
+        classifing = false;
+        this.setData({
+          status: '我猜不出来(╥╯^╰╥)',
+        });
       });
     });
 

@@ -35,7 +35,6 @@ async function loadModels() {
   }
 
   console.log('Loading models...');
-  console.log(wx.env.USER_DATA_PATH);
   // tf.tensor([1, 2]).print();
 
   /* 下载并读取类型名文件 */
