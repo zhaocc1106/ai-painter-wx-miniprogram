@@ -1,10 +1,12 @@
 {
 	"description": "项目配置文件。",
 	"packOptions": {
-		"ignore": [{
-			"type": "folder",
-			"value": "images/gif/"
-		}]
+		"ignore": [
+			{
+				"type": "folder",
+				"value": "images/gif/"
+			}
+		]
 	},
 	"setting": {
 		"urlCheck": false,

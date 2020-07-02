@@ -103,6 +103,7 @@ Page({
     this.fillBackground(this.context);
     this.draw();
 
+    predictStroke = [];
     wx.showLoading({
       title: '加载模型...',
       mask: true,
