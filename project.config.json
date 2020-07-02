@@ -5,6 +5,10 @@
 			{
 				"type": "folder",
 				"value": "images/gif/"
+			},
+			{
+				"type": "file",
+				"value":"images/mini-code.jpg"
 			}
 		]
 	},
