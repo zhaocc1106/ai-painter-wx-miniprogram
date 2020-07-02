@@ -1,5 +1,6 @@
 # ai-painter-wx-miniprogram
-tensorflow跑在微信小程序上，实现AI识别简笔画，AI自动画画等。
+tensorflow跑在微信小程序上，实现AI识别简笔画，AI自动画画等。<br>
+<img src="https://github.com/zhaocc1106/ai-painter-wx-miniprogram/blob/master/images/mini-code.jpg"  alt="mini-code">
 
 
 ## quick_draw_classifier模型
