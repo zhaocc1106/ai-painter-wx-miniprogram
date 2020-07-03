@@ -15,7 +15,7 @@ https://github.com/zhaocc1106/machine_learn/tree/master/NeuralNetworks-tensorflo
 tensorflowjs_converter --input_format keras model.h5 ./
 ```
 转换后会生成model.json文件以及group bin文件，分别记录网络结构以及参数值。<br>
-实际应用模型时可能需要修改一些地方，比如修改model.json的input layer的batch size为1；修改dropout training参数为false。当然也可以在保存H5模型文件前做修改。
+实际应用模型时可能需要修改一些地方，比如修改model.json的input layer的batch size为1；修改dropout training参数为false。当然也可以在保存HDF5模型文件前做修改。
 #### 演示
 <img src="https://github.com/zhaocc1106/ai-painter-wx-miniprogram/blob/master/images/gif/ai-classifier.gif"  alt="ai-classifier">
 
@@ -32,7 +32,7 @@ https://github.com/zhaocc1106/machine_learn/tree/master/NeuralNetworks-tensorflo
 tensorflowjs_converter --input_format keras model.h5 ./
 ```
 转换后会生成model.json文件以及group bin文件，分别记录网络结构以及参数值。<br>
-实际应用模型时可能需要修改一些地方，比如修改model.json的input layer的batch size为1；修改dropout training参数为false。当然也可以在保存H5模型文件前做修改。
+实际应用模型时可能需要修改一些地方，比如修改model.json的input layer的batch size为1；修改dropout training参数为false。当然也可以在保存HDF5模型文件前做修改。
 #### 遗留问题
 对起始笔画要求比较高,可能是如下原因:<br>
 1. 笔画采集和预处理不太满足模型输入<br>
