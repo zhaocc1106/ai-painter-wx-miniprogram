@@ -9,6 +9,7 @@ tensorflow跑在微信小程序上，实现AI识别简笔画，AI自动画画等
 #### 数据集
 使用[quick_draw dataset](https://github.com/googlecreativelab/quickdraw-dataset).<br>
 #### 模型训练
+https://github.com/zhaocc1106/machine_learn/tree/master/NeuralNetworks-tensorflow/RNN/quick_draw<br>
 https://github.com/zhaocc1106/machine_learn/tree/master/NeuralNetworks-tensorflow/RNN/quick_draw/quick_draw_classify<br>
 训练完之后通过如下命令将模型转换为tensorflow.js模型。
 ```
@@ -26,6 +27,7 @@ tensorflowjs_converter --input_format keras model.h5 ./
 #### 数据集
 使用[quick_draw dataset](https://github.com/googlecreativelab/quickdraw-dataset).<br>
 #### 模型训练
+https://github.com/zhaocc1106/machine_learn/tree/master/NeuralNetworks-tensorflow/RNN/quick_draw<br>
 https://github.com/zhaocc1106/machine_learn/tree/master/NeuralNetworks-tensorflow/RNN/quick_draw/auto_draw<br>
 训练完之后通过如下命令将模型转换为tensorflow.js模型。
 ```
