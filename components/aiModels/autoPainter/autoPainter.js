@@ -124,7 +124,7 @@ async function generate(beginStroke) {
     pred = await predTf.dataSync();
     predTf.dispose();
     // Find he last ink.
-    pred_ = [pred[0], pred[1], pred[2], pred[3]];
+    pred_ = [pred[0], pred[1], pred[2] >= 0.5 ? 1.0 : 0.0, pred[3] >= 0.5 ? 1.0 : 0.0];
     // Save the new ink.
     beginStroke.push(pred_);
   } while (pred[3] < 0.5 && beginStroke.length <= MAX_LEN[curModelType] - initialLen);
