@@ -21,11 +21,11 @@ const MAX_LEN = {
   'tree': 100
 }
 const MODELS_URL = {
-  'flower': 'https://6169-ai-painter-7q1db-1302478925.tcb.qcloud.la/auto-painter/flower/model.json',
-  'butterfly': 'https://6169-ai-painter-7q1db-1302478925.tcb.qcloud.la/auto-painter/butterfly/model.json',
-  'apple': 'https://6169-ai-painter-7q1db-1302478925.tcb.qcloud.la/auto-painter/apple/model.json',
+  'flower': 'https://6169-ai-painter-6g4jfmfl19cfbe8f-1302478925.tcb.qcloud.la/auto-painter/flower/model.json',
+  'butterfly': 'https://6169-ai-painter-6g4jfmfl19cfbe8f-1302478925.tcb.qcloud.la/auto-painter/butterfly/model.json',
+  'apple': 'https://6169-ai-painter-6g4jfmfl19cfbe8f-1302478925.tcb.qcloud.la/auto-painter/apple/model.json',
   'house': 'https://6169-ai-painter-7q1db-1302478925.tcb.qcloud.la/auto-painter/house/model.json',
-  'sun': 'https://6169-ai-painter-7q1db-1302478925.tcb.qcloud.la/auto-painter/sun/model.json',
+  'sun': 'https://6169-ai-painter-6g4jfmfl19cfbe8f-1302478925.tcb.qcloud.la/auto-painter/sun/model.json',
   'tree': 'https://6169-ai-painter-7q1db-1302478925.tcb.qcloud.la/auto-painter/tree/model.json'
 }
 
