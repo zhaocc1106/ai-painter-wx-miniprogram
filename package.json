@@ -9,12 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@tensorflow/tfjs-backend-cpu": "3.5.0",
-    "@tensorflow/tfjs-backend-webgl": "3.5.0",
-    "@tensorflow/tfjs-backend-wasm": "3.5.0",
-    "@tensorflow/tfjs-core": "3.5.0",
-    "@tensorflow/tfjs-layers": "3.5.0",
-    "@tensorflow/tfjs-converter": "3.5.0",
+    "@tensorflow/tfjs-backend-cpu": "2.0.1",
+    "@tensorflow/tfjs-backend-webgl": "2.0.1",
+    "@tensorflow/tfjs-backend-wasm": "2.0.1",
+    "@tensorflow/tfjs-core": "2.0.1",
+    "@tensorflow/tfjs-layers": "2.0.1",
+    "@tensorflow/tfjs-converter": "2.0.1",
     "fetch-wechat": "0.0.3",
     "regenerator-runtime": "0.13.5"
   }
