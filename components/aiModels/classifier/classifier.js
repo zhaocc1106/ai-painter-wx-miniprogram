@@ -62,7 +62,7 @@ async function loadModels() {
     }
   });
 
-  console.time('LoadModel');
+  // console.time('LoadModel');
 
   /* 加载模型 */
   const fileStorageHandler = plugin.fileStorageIO('classifier', wx.getFileSystemManager());
@@ -91,7 +91,7 @@ async function loadModels() {
   pred.dispose();
   model.resetStates();
 
-  console.timeEnd('LoadModel');
+  // console.timeEnd('LoadModel');
   return true;
 }
 

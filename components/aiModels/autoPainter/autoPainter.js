@@ -64,7 +64,7 @@ async function loadModels(modelType) {
     return true;
   }
 
-  console.time('LoadModel');
+  // console.time('LoadModel');
   console.log('Loading models...');
 
   /* 加载并预热模型 */
@@ -83,7 +83,7 @@ async function loadModels(modelType) {
   console.log(predArr);
   pred.dispose();
 
-  console.timeEnd('LoadModel');
+  // console.timeEnd('LoadModel');
   return true;
 }
 
@@ -97,7 +97,7 @@ async function generate(beginStroke) {
     console.log("Model unloaded.!");
     return null;
   }
-  console.time('Generate');
+  // console.time('Generate');
 
   // The initial inks len.
   const initialLen = beginStroke.length;
@@ -132,7 +132,7 @@ async function generate(beginStroke) {
   // Pop the initial inks.
   let followStroke = beginStroke.splice(initialLen, beginStroke.length - initialLen);
 
-  console.timeEnd('Generate');
+  // console.timeEnd('Generate');
   return followStroke;
 }
 
